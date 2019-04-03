@@ -261,12 +261,12 @@ class Algorithm:
 
         # Assure enough historicals data will be processed
         if len(historical_times) == 0:
-            self.log("Not enough data for a backtest.", 'error', 't')
+            self.log("Not enough data for a backtest.", 't')
             return
 
         # Assure enough cash is allocated
         if self.cash == 0.00:
-            self.log("Not enough starting cash for backtest.", 'error', 't')
+            self.log("Not enough starting cash for backtest.", 't')
             return
 
         previous_value = self.value()
