@@ -8,7 +8,9 @@ import os
 import numpy as np
 from os.path import join, dirname
 from dotenv import load_dotenv
-sys.path.append('src')
+my_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(my_path, '..', 'src'))
+sys.path.append(os.path.join(my_path, '..', 'ext_modules'))
 
 # Local Imports
 from query import *
@@ -50,4 +52,9 @@ my_port = query.user_portfolio()
 #   Driver (Your Algorithms Here)
 #
 
-NoDayTradesAlgorithm(query, my_port, test=True, cash=1000)
+print('Starting NoDayTradesAlgorithm')
+NoDayTradesAlgorithm(query=query, portfolio=my_port, sec_interval=30, test=True, cash=1000)
+#print('Starting ShortIntensiveAlgorithm')
+#ShortIntensiveAlgorithm(query, my_port, test=True, cash=1000)
+#print('Starting TopMoversNoDayTradesAlgorithm')
+#TopMoversNoDayTradesAlgorithm(query, my_port, test=True, cash=1000)

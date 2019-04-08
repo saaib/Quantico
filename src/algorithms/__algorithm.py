@@ -119,6 +119,7 @@ class Algorithm:
         self.log("Market will open.")
         self.event = Event.ON_MARKET_WILL_OPEN
         self.__reset_for_next_day()
+        self.log(f'Updating cash to: {cash}', 't')
         self.__update_cash(cash)
         self.__update_prices(prices)
         pass
@@ -130,6 +131,7 @@ class Algorithm:
     def on_market_open(self, cash = None, prices = None):
         self.log("Market just opened.")
         self.event = Event.ON_MARKET_OPEN
+        self.log(f'Updating cash to: {cash}', 't')
         self.__update_cash(cash)
         self.__update_prices(prices)
         pass
@@ -141,6 +143,7 @@ class Algorithm:
     def while_market_open(self, cash = None, prices = None):
         self.log("Market currently open.")
         self.event = Event.WHILE_MARKET_OPEN
+        self.log(f'Updating cash to: {cash}', 't')
         self.__update_cash(cash)
         self.__update_prices(prices)
         pass
@@ -152,6 +155,7 @@ class Algorithm:
     def on_market_close(self, cash = None, prices = None):
         self.log("Market has closed.")
         self.event = Event.ON_MARKET_CLOSE
+        self.log(f'Updating cash to: {cash}', 't')
         self.__update_cash(cash)
         self.__update_prices(prices)
         pass
@@ -179,6 +183,7 @@ class Algorithm:
         type = type.lower()
         if not isinstance(message, str):
             message = str(message)
+        print(message)
         if self.test and (type != "t" and type != "test"):
             self.logs.append("Backtest: " + message)
         elif type == 'error' or type == 'w' or type == 'err':
@@ -204,6 +209,7 @@ class Algorithm:
     def value(self):
         value = 0.00
         for quote in self.portfolio.get_quotes():
+            self.log(f'Backtest: quote {quote.symbol}: price: {self.price(quote.symbol)}, total value: {self.price(quote.symbol) * quote.count}', 't')
             value += (self.price(quote.symbol) * quote.count)
         return value
 
@@ -244,9 +250,11 @@ class Algorithm:
         if cash is None:
             # If cash is None, update it with current user's buying power.
             self.cash = self.query.user_buying_power()
+            self.log(f'   Updated cash to user_buying_power: {self.cash}', 't')
         else:
             # Otherwise, update it with given value.
             self.cash = cash
+        self.log(f'=>  Setting self.cash to: {self.cash}', 't')
 
     #
     # Backtesting
@@ -271,6 +279,7 @@ class Algorithm:
 
         previous_value = self.value()
         self.cash += previous_value
+        self.log(f'Backtest: Updated cash + previous_value to: {self.cash}', 't')
         start_cash = self.cash
 
         self.log("Starting backtest from " + Utility.get_timestamp_string(historical_times[0]) + " to " + Utility.get_timestamp_string(historical_times[-1]) + " with $" + str(start_cash), 't')
@@ -281,8 +290,10 @@ class Algorithm:
             self.timestamp = time
 
             self.cash -= previous_value
+            self.log(f'Backtest: Updated cash - previous_value to {self.cash}', 't')
             previous_value = self.value()
             self.cash += previous_value
+            self.log(f'Backtest: Updated cash + previous_value to {self.cash}', 't')
 
             # Announce progress
             percentage = (self.cash - start_cash) / start_cash * 100

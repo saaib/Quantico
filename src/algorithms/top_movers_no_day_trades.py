@@ -244,6 +244,7 @@ class TopMoversNoDayTradesAlgorithm(Algorithm):
             quantity = round(triple[2] / symbol_quintuple_map[symbol][-1][Quintuple.HIGH.value])
             limit = symbol_quintuple_map[symbol][-1][Quintuple.LOW.value]
             if quantity > 0.0:
+                Algorithm.log(self, f'Buying stock: {symbol}, quantity: {quantity}, limit: {limit}')
                 did_buy = Algorithm.buy(self, symbol, quantity, limit=limit)
 
         Algorithm.log(self, "Finished run of perform_buy_sell")

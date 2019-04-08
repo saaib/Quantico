@@ -27,6 +27,7 @@ class NoDayTradesAlgorithm(Algorithm):
         # Initialize properties
 
         # Range of prices for stock purchasing
+        #self.buy_range = (6.00, 40.00)
         self.buy_range = (6.00, 40.00)
 
         # All stocks available to buy/sell
@@ -48,7 +49,11 @@ class NoDayTradesAlgorithm(Algorithm):
         self.immediate_sale_price = self.buy_range[0]
 
         # Number of days to hold a stock until it must be sold
-        self.immediate_sale_age = 6
+        #self.immediate_sale_age = 6
+        self.immediate_sale_age = 1
+        
+        # Number of days to hold the stock at a minimum.
+        self.min_days_to_hold_stock = 0
 
         # Over simplistic tracking of position age
         self.age = {}
@@ -221,9 +226,7 @@ class NoDayTradesAlgorithm(Algorithm):
 
                 # Sell if the age has exceeded the immediate sale age and the immediate sale price is greater than the current price
                 if quote.symbol in self.age:
-                    if self.age[quote.symbol] < 2:
-                        pass
-                    elif self.immediate_sale_age <= self.age[quote.symbol] and self.immediate_sale_price >= current_price:
+                     if self.age[quote.symbol] > self.min_days_to_hold_stock and self.immediate_sale_age <= self.age[quote.symbol] and self.immediate_sale_price >= current_price:
                         Algorithm.sell(self, quote.symbol, stock_shares, None, current_price)
                         pass
                 else:
