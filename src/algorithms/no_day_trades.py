@@ -99,7 +99,7 @@ class NoDayTradesAlgorithm(Algorithm):
         for symbol in self.age:
             if not self.portfolio.is_symbol_in_portfolio(symbol):
                 self.age[quote.symbol] = 0
-            Algorithm.log(self, "stock.symbol: " + symbol + " : age: " + str(self.age[symbol]))
+            Algorithm.log(self, "stock.symbol: " + symbol + " : age: " + str(self.age[symbol]), 't')
 
         self.overwrite_age_file()
 
@@ -182,7 +182,7 @@ class NoDayTradesAlgorithm(Algorithm):
     # perform_buy_sell:Void
     def perform_buy_sell(self):
 
-        Algorithm.log(self, "Executing perform_buy_sell:")
+        Algorithm.log(self, "Executing perform_buy_sell:", 't')
 
         # Percentage of the current price to submit buy orders at
         BUY_FACTOR = 0.99
@@ -239,7 +239,7 @@ class NoDayTradesAlgorithm(Algorithm):
         weight_for_buy_order = float(1.00 / self.max_simult_buy_orders)
 
         # Iterate over each candidate to sell
-        open_buy_order_count
+        open_buy_order_count = 0
         for symbol in self.candidates:
 
             # Finish buying stocks once the limit has been reached

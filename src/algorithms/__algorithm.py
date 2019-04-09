@@ -209,8 +209,9 @@ class Algorithm:
     def value(self):
         value = 0.00
         for quote in self.portfolio.get_quotes():
-            self.log(f'Backtest: quote {quote.symbol}: price: {self.price(quote.symbol)}, total value: {self.price(quote.symbol) * quote.count}', 't')
-            value += (self.price(quote.symbol) * quote.count)
+            quote_price = self.price(quote.symbol)
+            self.log(f'Backtest: quote {quote.symbol}: price: {quote_price}, total value: {quote_price * quote.count}', 't')
+            value += (quote_price * quote.count)
         return value
 
     # price:Void
@@ -219,15 +220,17 @@ class Algorithm:
     def price(self, symbol):
         if symbol in self.prices:
             return self.prices[symbol]
-        elif self.test and self.timestamp in self.portfolio.get_symbol_history_map(symbol):
-            price = self.portfolio.get_symbol_history_map(symbol)[self.timestamp]
-            if self.event == Event.WHILE_MARKET_OPEN:
-                return price.low
-            elif self.event == Event.ON_MARKET_CLOSE:
-                return price.close
-            else:
-                return price.open
-            return
+        else:
+            history_map = self.portfolio.get_symbol_history_map(symbol)
+            if self.test and self.timestamp in history_map:
+                price = history_map[self.timestamp]
+                if self.event == Event.WHILE_MARKET_OPEN:
+                    return price.low
+                elif self.event == Event.ON_MARKET_CLOSE:
+                    return price.close
+                else:
+                    return price.open
+                return
         return self.query.get_current_price(symbol)
 
     # __update_prices:Void
@@ -265,6 +268,7 @@ class Algorithm:
     def __backtest(self):
         # Map each symbol to a list of historical prices.
         historicals_map, historical_times = self.portfolio.get_history_tuple(Span.DAY, Span.YEAR, Bounds.REGULAR)
+#         historicals_map, historical_times = self.portfolio.get_history_tuple(Span.FIVE_MINUTE, Span.YEAR, Bounds.REGULAR)
         symbols = self.portfolio.get_symbols()
 
         # Assure enough historicals data will be processed
@@ -277,9 +281,9 @@ class Algorithm:
             self.log("Not enough starting cash for backtest.", 't')
             return
 
-        previous_value = self.value()
-        self.cash += previous_value
-        self.log(f'Backtest: Updated cash + previous_value to: {self.cash}', 't')
+        #previous_value = self.value()
+        #self.cash += previous_value
+        #self.log(f'Backtest: Updated cash + previous_value to: {self.cash}', 't')
         start_cash = self.cash
 
         self.log("Starting backtest from " + Utility.get_timestamp_string(historical_times[0]) + " to " + Utility.get_timestamp_string(historical_times[-1]) + " with $" + str(start_cash), 't')
@@ -289,19 +293,19 @@ class Algorithm:
 
             self.timestamp = time
 
-            self.cash -= previous_value
-            self.log(f'Backtest: Updated cash - previous_value to {self.cash}', 't')
-            previous_value = self.value()
-            self.cash += previous_value
-            self.log(f'Backtest: Updated cash + previous_value to {self.cash}', 't')
+            #self.cash -= previous_value
+            #self.log(f'Backtest: Updated cash - previous_value to {self.cash}', 't')
+            #previous_value = self.value()
+            #self.cash += previous_value
+            #self.log(f'Backtest: Updated cash + previous_value to {self.cash}', 't')
 
             # Announce progress
             percentage = (self.cash - start_cash) / start_cash * 100
             difference = self.cash - start_cash
             if percentage >= 0.00:
-                self.log(Utility.get_timestamp_string(time) + " (backtest): cash($" + str(self.cash) + "), gain(" + str(abs(percentage)) + "%, $" + str(abs(difference)) + ")", 't')
+                self.log(Utility.get_timestamp_string(time) + f" (backtest): timestamp: {self.timestamp}, cash($" + str(self.cash) + "), gain(" + str(abs(percentage)) + "%, $" + str(abs(difference)) + ")", 't')
             else:
-                self.log(Utility.get_timestamp_string(time) + " (backtest): cash($" + str(self.cash) + "), loss(" + str(abs(percentage)) + "%, $" + str(abs(difference)) + ")", 't')
+                self.log(Utility.get_timestamp_string(time) + f" (backtest): timestamp: {self.timestamp}, cash($" + str(self.cash) + "), loss(" + str(abs(percentage)) + "%, $" + str(abs(difference)) + ")", 't')
 
             # Store five maps of symbols to instantaneous prices
             on_market_will_open_prices = {}
@@ -418,7 +422,7 @@ class Algorithm:
                 cancelled_order_ids = self.query.exec_cancel_open_orders()
                 Utility.log("Cancelled orders " + str(cancelled_order_ids))
             else:
-                self.log("Backtest: Cancelled open orders")
+                self.log("Backtest: Cancelled open orders", 't')
             return True
         except:
             Utility.error("Could not cancel open orders: A client error occurred")

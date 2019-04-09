@@ -36,10 +36,10 @@ class Query:
     # returns List of symbols that fit the given criteria.
     def get_fundamentals_by_criteria(self, price_range = (0.00, sys.maxsize), tags = None):
         all_symbols = []
-        if tags is not None and tags is not []:
+        if tags:
             if isinstance(tags, Enum):
                 try:
-                    all_symbols = self.get_by_tag(tag)
+                    all_symbols = self.get_by_tag(tags)
                 except Exception as e:
                     pass
             else:

@@ -53,7 +53,7 @@ my_port = query.user_portfolio()
 #
 
 print('Starting NoDayTradesAlgorithm')
-NoDayTradesAlgorithm(query=query, portfolio=my_port, sec_interval=30, test=True, cash=1000)
+NoDayTradesAlgorithm(query=query, portfolio=my_port, sec_interval=30, age_file='age_file.txt', test=True, cash=1000)
 #print('Starting ShortIntensiveAlgorithm')
 #ShortIntensiveAlgorithm(query, my_port, test=True, cash=1000)
 #print('Starting TopMoversNoDayTradesAlgorithm')

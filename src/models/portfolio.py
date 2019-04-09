@@ -116,11 +116,11 @@ class Portfolio:
     # param quoteOrSymbol:Quote => A quote object or symbol string to remove from the portfolio, if it exists.
     def remove_quote(self, quote_or_symbol):
         for i, q in enumerate(self.__quotes):
-            if (isinstance(quote_or_symbol, Quote) and q.symbol == quote.symbol) or quote_or_symbol == q.symbol:
+            if (isinstance(quote_or_symbol, Quote) and q.symbol == quote_or_symbol.symbol) or quote_or_symbol == q.symbol:
                 if isinstance(quote_or_symbol, Quote) and quote_or_symbol.count > self.__quotes[i].count:
                     self.__quotes[i].count -= quote_or_symbol.count
                 else:
-                    self.__quotes.remove(i)
+                    del self.__quotes[i]
                 self.update_assets()
                 return
 
